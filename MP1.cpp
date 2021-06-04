@@ -28,7 +28,6 @@ class UninformedSearch{
 public:
     UninformedSearch();
     list<Node*> breadthFirstSearch(Node*);
-    //bool containsPuzzle(list<Node*>, Node*);
 };
 
 int main(){
@@ -43,6 +42,7 @@ int main(){
 
     list<Node*> solution = ui.breadthFirstSearch(&root);
     if(solution.size()>0){
+        solution.reverse();
         for(list<Node*>::iterator it=solution.begin();it!=solution.end();++it)
             (*it)->printPuzzle();
     }
@@ -179,7 +179,7 @@ list<Node*> UninformedSearch::breadthFirstSearch(Node *root){
         openList.pop_front();
 
         currentNode->moveAllDirections();
-        //currentNode->printPuzzle();
+        // currentNode->printPuzzle();
         for(list<Node*>::iterator it=currentNode->children.begin();it!=currentNode->children.end()&&!goalFound;++it){
             //Node* currentChild = currentNode->children.front();
             
@@ -187,7 +187,6 @@ list<Node*> UninformedSearch::breadthFirstSearch(Node *root){
                 cout << "GOAL FOUND\n";
                 goalFound = true;
                 //trace dayun sa path kay nakit-an naman
-                cout << "Tracing path...\n";
                 Node *current = *it;
                 pathToSolution.push_back(current);
 
@@ -196,17 +195,17 @@ list<Node*> UninformedSearch::breadthFirstSearch(Node *root){
                     pathToSolution.push_back(current);
                 }
             }
-            bool contains = false;
+            bool containsClosed = false;
+            bool containsOpen = false;
+            for(list<Node*>::iterator itt=closedList.begin();itt!=closedList.end();++itt)
+                if((*itt)->samePuzzle((*it)->puzzle))
+                    containsClosed = true;
             for(list<Node*>::iterator itt=openList.begin();itt!=openList.end();++itt)
                 if((*itt)->samePuzzle((*it)->puzzle))
-                    contains = true;
-            if(!contains)
+                    containsOpen = true;
+            if(!containsClosed&&!containsOpen)
                 openList.push_back(*it);
         }
     }
     return pathToSolution;
 }
-
-// bool UninformedSearch::containsPuzzle(list<Node*> lest, Node *c){
-    
-// }
