@@ -24,6 +24,13 @@ public:
 
 };
 
+class UninformedSearch{
+public:
+    UninformedSearch();
+    list<Node*> breadthFirstSearch(Node*);
+    //bool containsPuzzle(list<Node*>, Node*);
+};
+
 int main(){
     int array[9] = {
         1, 2, 4,
@@ -31,15 +38,16 @@ int main(){
         7, 6, 8
     };
 
-    Node n(array);
-    n.moveAllDirections();
-    //n.printPuzzle();
-    list<Node*>::iterator it;
-    for(it = n.children.begin();it!=n.children.end();++it){
-        (*it)->printPuzzle();
-        (*it)->parent->printPuzzle();
+    Node root(array);
+    UninformedSearch ui;
+
+    list<Node*> solution = ui.breadthFirstSearch(&root);
+    if(solution.size()>0){
+        for(list<Node*>::iterator it=solution.begin();it!=solution.end();++it)
+            (*it)->printPuzzle();
     }
-    
+    else
+        cout << "NO SOLUTION WAS FOUND\n";
 }
 
 Node::Node(){
@@ -152,3 +160,53 @@ void Node::moveAllDirections(){
     moveDown(puzzle, x);
 
 }
+
+UninformedSearch::UninformedSearch(){
+
+}
+
+list<Node*> UninformedSearch::breadthFirstSearch(Node *root){
+    list<Node*> pathToSolution;
+    list<Node*> openList;
+    list<Node*> closedList;
+
+    openList.push_back(root);
+    bool goalFound = false;
+
+    while(openList.size()>0&&!goalFound){
+        Node* currentNode = openList.front();
+        closedList.push_back(currentNode);
+        openList.pop_front();
+
+        currentNode->moveAllDirections();
+        //currentNode->printPuzzle();
+        for(list<Node*>::iterator it=currentNode->children.begin();it!=currentNode->children.end()&&!goalFound;++it){
+            //Node* currentChild = currentNode->children.front();
+            
+            if((*it)->goalTest()){
+                cout << "GOAL FOUND\n";
+                goalFound = true;
+                //trace dayun sa path kay nakit-an naman
+                cout << "Tracing path...\n";
+                Node *current = *it;
+                pathToSolution.push_back(current);
+
+                while(current->parent!=NULL){
+                    current = current->parent;
+                    pathToSolution.push_back(current);
+                }
+            }
+            bool contains = false;
+            for(list<Node*>::iterator itt=openList.begin();itt!=openList.end();++itt)
+                if((*itt)->samePuzzle((*it)->puzzle))
+                    contains = true;
+            if(!contains)
+                openList.push_back(*it);
+        }
+    }
+    return pathToSolution;
+}
+
+// bool UninformedSearch::containsPuzzle(list<Node*> lest, Node *c){
+    
+// }
